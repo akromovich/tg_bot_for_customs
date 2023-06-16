@@ -1,2 +1,2 @@
-TOKEN = '.'
+TOKEN = ''
 ID_ADMIN = 1109419484
