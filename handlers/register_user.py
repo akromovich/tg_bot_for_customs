@@ -13,7 +13,7 @@ async def start(msg: types.Message):
     global ID
     ID = msg.from_user.id
 
-    if not await db.check_user(msg.from_user.id):
+    if not await db.check_user(msg.from_user.id)==False:
         await msg.answer('Введите имя:')
     else:
         await bot.send_message(msg.chat.id, "вы уже прошли регистрацию")
