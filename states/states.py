@@ -1,6 +1,7 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
+
 class UserRegister(StatesGroup):
-    lang = State()
-    user_name= State()
+    f_i_o = State()
     phone_number = State()
+    lang = State()

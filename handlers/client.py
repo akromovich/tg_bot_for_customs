@@ -1,26 +1,29 @@
+from handlers.admin import  catalog
+from handlers.register_user import start
 from create_bot import dp
-from aiogram import  types
+from aiogram import Dispatcher, types
 
 from keyboards.kb_admin import *
 
 
 @dp.message_handler()
-async def asd(msg:types.Message):
-    if msg.text=='назад◀️':
-        from handlers.admin import start
+async def asd(msg: types.Message):
+    if msg.text == 'назад◀️':
         await start(msg)
-    elif msg.text=='Детский мир':
-        await msg.answer(f'категория: {msg.text}',reply_markup=detskiy_m)
-    elif msg.text=='Транспорт':
-        await msg.answer(f'категория: {msg.text}',reply_markup=transport_m)
-    elif msg.text=='Для дома':
-        await msg.answer(f'категория: {msg.text}',reply_markup=dom_m)
-    elif msg.text=='Электроника':
-        await msg.answer(f'категория: {msg.text}',reply_markup=electronic_m)
+    elif msg.text == 'назад':
+        await catalog(msg)
+    elif msg.text == 'Детский мир':
+        await msg.answer(f'категория: {msg.text}', reply_markup=detskiy_m)
+    elif msg.text == 'Транспорт':
+        await msg.answer(f'категория: {msg.text}', reply_markup=transport_m)
+    elif msg.text == 'Для дома':
+        await msg.answer(f'категория: {msg.text}', reply_markup=dom_m)
+    elif msg.text == 'Электроника':
+        await msg.answer(f'категория: {msg.text}', reply_markup=electronic_m)
     elif msg.text == 'Сырьё/Материалы':
-        await msg.answer(f'категория: {msg.text}',reply_markup=materials_m)
+        await msg.answer(f'категория: {msg.text}', reply_markup=materials_m)
     elif msg.text == 'Одежда':
-        await msg.answer(f'категория: {msg.text}',reply_markup=clothes_m)
+        await msg.answer(f'категория: {msg.text}', reply_markup=clothes_m)
     elif msg.text == 'детская одежда':
         await msg.answer(msg.text)
     elif msg.text == 'детская обувь':
@@ -67,3 +70,5 @@ async def asd(msg:types.Message):
         pass
 
 
+def register_client_handlers(dp:Dispatcher):
+    pass
