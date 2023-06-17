@@ -33,10 +33,10 @@ class DataBase:
             self.connect.commit()
 
     async def check_user(self, user_id):
-
-        user_data = db.select(self.users).where(self.users.columns.user_id == user_id)
-        answer = self.connect.execute(user_data)
-        return bool(answer)
+        with self.engine.connect()  as connect:
+            user_data = db.select(self.users).where(self.users.columns.user_id == user_id)
+            answer = connect.execute(user_data)
+            return bool(len(answer.fetchall()))
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())

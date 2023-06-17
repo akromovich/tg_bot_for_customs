@@ -4,22 +4,39 @@ from states.states import UserRegister
 from db import DataBase
 from aiogram.dispatcher import FSMContext
 from keyboards.kb_admin import *
+from config import ID_ADMIN
 
 db = DataBase()
 
 
 @dp.message_handler(commands=['start'])
 async def start(msg: types.Message):
-    print(f'{msg.from_user.id} {msg.from_user.first_name} {msg.date},')
+    print(f'{msg.from_user.id} {msg.from_user.first_name} {msg.date}')
 
     global ID
     ID = msg.from_user.id
+    if msg.from_user.id==ID_ADMIN:
+        await msg.answer('siz adminsiz')
+        await main_menu(msg)
+    else:   
+        if not await db.check_user(msg.from_user.id):
+            await msg.answer('Ismni kiriting F.I.O\nmisol:\nAzizov Aziz Azizovich:')
+            await UserRegister.first()
+        else:
+            await bot.send_message(msg.chat.id, "siz ro`yhatdan utgansiz")
+            await main_menu(msg)
 
-    if not await db.check_user(msg.from_user.id) == False:
-        await msg.answer('Введите Ф.И.О\nпример:\nАзизов Азиз Азизович:')
-        await UserRegister.first()
-    else:
-        await bot.send_message(msg.chat.id, "вы уже прошли регистрацию")
+@dp.message_handler(commands=['menu'])
+async def main_menu(msg:types.Message):
+    if msg.from_user.id==ID_ADMIN:
+        await msg.answer('Bosh menyu👇',reply_markup=kb)                
+    else:   
+        if not await db.check_user(msg.from_user.id):
+            await msg.answer('Ismni kiriting F.I.O\nmisol:\nAzizov Aziz Azizovich:')
+            await UserRegister.first()
+        else:
+            await bot.send_message(msg.chat.id, "bo`limlni tanlang",reply_markup=kb)    
+
 
 
 @dp.message_handler(state=UserRegister.f_i_o)
@@ -31,7 +48,7 @@ async def load_name(msg: types.Message, state=FSMContext):
     await UserRegister.next()
 
 
-@dp.message_handler(state=UserRegister.phone_number,content_types=['contact'])
+@dp.message_handler(state=UserRegister.phone_number, content_types=['contact'])
 async def load_phone_number(msg: types.Message, state=FSMContext):
     await msg.answer(msg)
     async with state.proxy() as data:
@@ -46,39 +63,40 @@ async def load_lang(msg: types.Message, state=FSMContext):
     async with state.proxy() as data:
         data['lang'] = msg.text
         await db.add_user(data)
-    await UserRegister.next()
+    await state.finish()
+    await start(msg)
 
 # @dp.message_handler(state=UserRegister.phone)
 
 
-async def load_phone(msg: types.Message, state=FSMContext):
-    if msg.contact:
-        async with state.proxy() as data:
-            data['phone'] = msg.contact['phone_number']
-        async with state.proxy() as data:
-            await db.add_user(state)
-            await msg.answer('Ожидание подтверждения...')
-            await bot.send_message(ID_ADMIN, f'<b>{data["name"]}</b> <b>{data["surname"]}</b> хочет присоеденится к боту\nномер: {data["phone"]}', parse_mode='html', reply_markup=kb_admin.exam)
-            await state.finish()
-    else:
-        await msg.answer('Введите номер', reply_markup=kb_admin.contact)
+# async def load_phone(msg: types.Message, state=FSMContext):
+#     if msg.contact:
+#         async with state.proxy() as data:
+#             data['phone'] = msg.contact['phone_number']
+#         async with state.proxy() as data:
+#             await db.add_user(state)
+#             await msg.answer('Ожидание подтверждения...')
+#             await bot.send_message(ID_ADMIN, f'<b>{data["name"]}</b> <b>{data["surname"]}</b> хочет присоеденится к боту\nномер: {data["phone"]}', parse_mode='html', reply_markup=kb_admin.exam)
+#             await state.finish()
+#     else:
+#         await msg.answer('Введите номер', reply_markup=kb_admin.contact)
 
 
-async def autorize(callback: types.CallbackQuery, state=FSMContext):
+# async def autorize(callback: types.CallbackQuery, state=FSMContext):
 
-    if callback.data == 'answer_отказать':
-        await db.del_user(ID)
-        await bot.send_message(ID, 'отказано в доступе к боту')
-        await callback.msg.answer('вы отказали пользователя', reply_markup=kb_admin.menu_kb)
-        await callback.answer()
-        await callback.msg.delete()
-    elif callback.data == 'answer_принять':
-        await bot.send_message(ID, 'вас приняли ')
-        await callback.msg.answer('принято', reply_markup=kb_admin.menu_kb)
-        await callback.answer()
-        await callback.msg.delete()
-    else:
-        await callback.ansnwer('ошибка')
+#     if callback.data == 'answer_отказать':
+#         await db.del_user(ID)
+#         await bot.send_message(ID, 'отказано в доступе к боту')
+#         await callback.msg.answer('вы отказали пользователя', reply_markup=kb_admin.menu_kb)
+#         await callback.answer()
+#         await callback.msg.delete()
+#     elif callback.data == 'answer_принять':
+#         await bot.send_message(ID, 'вас приняли ')
+#         await callback.msg.answer('принято', reply_markup=kb_admin.menu_kb)
+#         await callback.answer()
+#         await callback.msg.delete()
+#     else:
+#         await callback.ansnwer('ошибка')
 
 
 def register_user_handlers(dp: Dispatcher):

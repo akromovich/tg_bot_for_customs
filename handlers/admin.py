@@ -7,7 +7,7 @@ from keyboards.kb_admin import *
 
 @dp.message_handler(Text(equals='Katalog🗂'))
 async def catalog(msg:types.Message):
-    await msg.answer('Каталог нашего бота',reply_markup=katalog)
+    await msg.answer('Bosh katalogi',reply_markup=katalog)
 
 
 
