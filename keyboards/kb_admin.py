@@ -61,4 +61,15 @@ clothes_2 = KeyboardButton("женская")
 clothes_3 = KeyboardButton("обувь")
 clothes_4 = KeyboardButton("наручные часы")
 clothes_5 = KeyboardButton("прочие")
-clothes_m.add(clothes_1, clothes_2, clothes_3, clothes_4, clothes_5).add(back_category)
+clothes_m.add(clothes_1, clothes_2, clothes_3,
+              clothes_4, clothes_5).add(back_category)
+
+phone_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+phone_k1 = KeyboardButton('Отправть контакт', request_contact=True)
+phone_kb.add(phone_k1)
+
+lang_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+lang_uz = KeyboardButton('UZ')
+lang_ru = KeyboardButton('RU')
+lang_eng = KeyboardButton('ENG')
+lang_kb.add(lang_uz, lang_ru, lang_eng)
