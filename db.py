@@ -29,7 +29,6 @@ class DataBase:
                     'phone_number':data['phone_number'], 'lang':data['lang']},
             ])
             self.connect.execute(insert_query)
-            print(1)
             self.connect.commit()
 
     async def check_user(self, user_id):

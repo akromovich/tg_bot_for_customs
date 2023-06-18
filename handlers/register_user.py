@@ -1,24 +1,25 @@
 from aiogram import Dispatcher, types
 from create_bot import dp, bot
+from handlers.admin import main_menu
 from states.states import UserRegister
 from db import DataBase
 from aiogram.dispatcher import FSMContext
 from keyboards.kb_admin import *
 from config import ID_ADMIN
-
+from aiogram.types import ReplyKeyboardRemove
 db = DataBase()
 
 
 @dp.message_handler(commands=['start'])
 async def start(msg: types.Message):
-    print(f'{msg.from_user.id} {msg.from_user.first_name} {msg.date}')
+    print(f'{msg.from_user.id} {msg.from_user.first_name} {msg.date} |{msg.text}')
 
     global ID
     ID = msg.from_user.id
-    if msg.from_user.id==ID_ADMIN:
-        await msg.answer('siz adminsiz')
+    if msg.from_user.id == ID_ADMIN:
+        await msg.answer('siz adminsiz✅')
         await main_menu(msg)
-    else:   
+    else:
         if not await db.check_user(msg.from_user.id):
             await msg.answer('Ismni kiriting F.I.O\nmisol:\nAzizov Aziz Azizovich:')
             await UserRegister.first()
@@ -26,16 +27,6 @@ async def start(msg: types.Message):
             await bot.send_message(msg.chat.id, "siz ro`yhatdan utgansiz")
             await main_menu(msg)
 
-@dp.message_handler(commands=['menu'])
-async def main_menu(msg:types.Message):
-    if msg.from_user.id==ID_ADMIN:
-        await msg.answer('Bosh menyu👇',reply_markup=kb)                
-    else:   
-        if not await db.check_user(msg.from_user.id):
-            await msg.answer('Ismni kiriting F.I.O\nmisol:\nAzizov Aziz Azizovich:')
-            await UserRegister.first()
-        else:
-            await bot.send_message(msg.chat.id, "bo`limlni tanlang",reply_markup=kb)    
 
 
 
@@ -44,28 +35,30 @@ async def load_name(msg: types.Message, state=FSMContext):
     async with state.proxy() as data:
         data['user_id'] = msg.from_user.id
         data['f.i.o'] = msg.text
-    await msg.answer('Отправьте номер телефона\nнажмите кнопку снизу чтобы отправить контакт', reply_markup=phone_kb)
+    await msg.answer('Отправьте номер телефона\nнажмите кнопку снизу чтобы отправить контакт👇', reply_markup=phone_kb)
     await UserRegister.next()
 
 
 @dp.message_handler(state=UserRegister.phone_number, content_types=['contact'])
 async def load_phone_number(msg: types.Message, state=FSMContext):
-    await msg.answer(msg)
     async with state.proxy() as data:
         data['phone_number'] = msg.contact['phone_number']
 
-    await msg.answer('Выберите язык\nнажмите кнопку снизу чтобы выбрать язык',)
+    await msg.answer('Выберите язык\nнажмите кнопку снизу чтобы выбрать язык👇', reply_markup=lang_kb)
     await UserRegister.next()
 
 
 @dp.message_handler(state=UserRegister.lang)
 async def load_lang(msg: types.Message, state=FSMContext):
-    async with state.proxy() as data:
-        data['lang'] = msg.text
-        await db.add_user(data)
-    await state.finish()
-    await start(msg)
-
+    if msg not in lang_kb:
+        async with state.proxy() as data:
+            data['lang'] = msg.text
+            await db.add_user(data)
+        await state.finish()
+        await msg.answer('siz ro`yhatdan o`tdingiz',reply_markup=ReplyKeyboardRemove())
+        await msg.answer('bosh menyuga utish uchun /menu buyrug`ini botga yuboring')
+    else:
+        await msg.answer(False)
 # @dp.message_handler(state=UserRegister.phone)
 
 
