@@ -19,7 +19,7 @@ k5_admin = KeyboardButton('Sozlamalar⚙️')
 k6_admin = KeyboardButton('Foydalanuvchilar Ro`yhati')
 k7_admin = KeyboardButton('Tovar kushish+')
 k8_admin = KeyboardButton('Kontakt kushish+')
-kb_admin.add(k1_admin).add(k2_admin, k3_admin, k4_admin, k5_admin)
+kb_admin.add(k1_admin).add(k2_admin, k3_admin, k4_admin, k5_admin,k6_admin,k7_admin,k8_admin)
 
 katalog = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 kt_1 = KeyboardButton('Детский мир')
