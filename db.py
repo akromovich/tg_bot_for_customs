@@ -36,6 +36,25 @@ class DataBase:
             user_data = db.select(self.users).where(self.users.columns.user_id == user_id)
             answer = connect.execute(user_data)
             return bool(len(answer.fetchall()))
+
+
+    async def list_users_db(self):
+        with self.engine.connect()  as connect:
+            res=db.select(self.users)
+            result = connect.execute(res)
+            # await message.answer(f'{i[0]}.{i[1]} {i[2]} \nдолжность:{i[3]}\n{i[4]}',reply_markup=kb_admin.del_or_send)
+            g = []
+            for i in result.fetchall():
+                a= f'id:{i[0]}\ntg_id: <code>{i[1]}</code>\nF.I.O: {i[2]}\ntelefon nomeri: <code>{i[3]}</code>\ntanlagan tili: {i[4]}\n_____________\n'
+                g.append(a)
+            return ''.join(g)
+
+    async def db_settings(self,user_id):
+        with self.engine.connect() as connect:
+            res = db.select(self.users).where(self.users.columns.user_id == user_id)
+            result = connect.execute(res)
+            for i in result.fetchall():
+                return f'F.I.O: {i[2]}\nTelefon raqami: {i[3]}\nTil: {i[4]}'
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())

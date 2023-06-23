@@ -6,7 +6,7 @@ from aiogram import Dispatcher, types
 from keyboards.kb_admin import *
 from states.states import UserRegister
 from db import DataBase
-
+from aiogram.types import ReplyKeyboardRemove
 db = DataBase()
 
 @dp.message_handler(Text(equals='Katalog🗂'))
@@ -24,7 +24,17 @@ async def main_menu(msg: types.Message):
         else:
             await bot.send_message(msg.chat.id, "bo`limlni tanlang👇", reply_markup=kb)
 
-
+@dp.message_handler(Text(equals='Foydalanuvchilar Ro`yhati'))
+async def list_users(msg:types.Message):
+    
+        if msg.from_user.id ==ID_ADMIN:
+            await msg.answer(await db.list_users_db(),parse_mode='html')
+        else:
+            await msg.answer('вы не админ')
+    
+@dp.message_handler(Text(equals='Sozlamalar⚙️'))
+async def settings(msg:types.Message):
+    await msg.answer(await db.db_settings(msg.from_user.id),reply_markup=for_contact)
 
 
 def register_admin_handlers(dp:Dispatcher):
