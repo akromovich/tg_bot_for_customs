@@ -16,7 +16,7 @@ async def start(msg: types.Message):
 
     global ID
     ID = msg.from_user.id
-    if msg.from_user.id == ID_ADMIN:
+    if msg.from_user.id in ID_ADMIN:
         await msg.answer('siz adminsiz✅')
         await main_menu(msg)
     else:

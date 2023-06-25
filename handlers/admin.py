@@ -27,7 +27,7 @@ async def main_menu(msg: types.Message):
 @dp.message_handler(Text(equals='Foydalanuvchilar Ro`yhati'))
 async def list_users(msg:types.Message):
     
-        if msg.from_user.id ==ID_ADMIN:
+        if msg.from_user.id in ID_ADMIN:
             await msg.answer(await db.list_users_db(),parse_mode='html')
         else:
             await msg.answer('вы не админ')
