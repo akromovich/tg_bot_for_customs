@@ -7,15 +7,24 @@ class DataBase:
         self.connect = self.engine.connect()
         self.metadata = db.MetaData()
         self.users = db.Table('users', self.metadata,
-                              db.Column('id', db.Integer, primary_key=True,
-                                        unique=True, autoincrement=True),
-                              db.Column('user_id', db.Integer, unique=True),
-                              db.Column('f.i.o', db.Text),
-                              db.Column('phone_number', db.Text),
-                              db.Column('lang', db.Text),
+                            db.Column('id', db.Integer, primary_key=True,unique=True, autoincrement=True),
+                            db.Column('user_id', db.Integer, unique=True),
+                            db.Column('f.i.o', db.Text),
+                            db.Column('phone_number', db.Text),
+                            db.Column('lang', db.Text),
+                            extend_existing=True)
 
-                              extend_existing=True
-                              )
+        self.contacts = db.Table('contact_us',self.metadata,
+                            db.Column('id',db.Integer,primary_key=True,unique=True,autoincrement=True),
+                            db.Column('phone_number_1',db.Text),
+                            db.Column('phone_number_2',db.Text),
+                            extend_existing=True)
+
+        self.about_us = db.Table('about_us',self.metadata,
+                            db.Column('id',db.Integer,primary_key=True,unique=True,autoincrement=True),
+                            db.Column('about_us',db.Text),
+                            extend_existing=True)
+
 
         self.metadata.create_all(self.engine)
     async def create_tables(self):
@@ -54,7 +63,15 @@ class DataBase:
             res = db.select(self.users).where(self.users.columns.user_id == user_id)
             result = connect.execute(res)
             for i in result.fetchall():
-                return f'F.I.O: {i[2]}\nTelefon raqami: {i[3]}\nTil: {i[4]}'
+                return f'F.I.O: {i[2]}\nTelefon raqami: <code>{i[3]}</code>\nTil: {i[4]}'
+        
+    async def db_contacts(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.contacts)
+            result = connect.execute(res)
+            # count = 0
+            for i in result.fetchall():
+                return f'Biz bilan bog`lanish uchun :\n<a>{i[1]}</a>\n<code>{i[2]}</code>\nraqamlariga qo`ng`iroq qilishingiz mumkin'
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())

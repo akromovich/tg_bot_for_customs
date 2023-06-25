@@ -15,7 +15,7 @@ async def catalog(msg:types.Message):
 
 @dp.message_handler(commands=['menu'])
 async def main_menu(msg: types.Message):
-    if msg.from_user.id == ID_ADMIN:
+    if msg.from_user.id in ID_ADMIN:
         await msg.answer('Bosh menyu👇', reply_markup=kb_admin)
     else:
         if not await db.check_user(msg.from_user.id):
@@ -34,8 +34,15 @@ async def list_users(msg:types.Message):
     
 @dp.message_handler(Text(equals='Sozlamalar⚙️'))
 async def settings(msg:types.Message):
-    await msg.answer(await db.db_settings(msg.from_user.id),reply_markup=for_contact)
+    await msg.answer(await db.db_settings(msg.from_user.id),parse_mode='html',reply_markup=for_contact)
 
+@dp.message_handler(Text(equals='Kontaktlar📞'))
+async def contacts(msg:types.Message):
+    
+    if msg.from_user.id in ID_ADMIN:
+        await msg.answer(await db.db_contacts(),parse_mode='html',reply_markup=kb_admin)
+    else:
+        await msg.answer(await db.db_contacts(),parse_mode='html',reply_markup=kb)
 
 def register_admin_handlers(dp:Dispatcher):
     pass
