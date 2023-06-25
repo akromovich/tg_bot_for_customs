@@ -43,7 +43,7 @@ async def edit_user_info(clb:types.Message):
 
 @dp.message_handler(state=EditUserDataFullName.full_name)
 async def edit_user_full_name(msg:types.Message,state:FSMContext):
-    await db.edit_fio(msg.from_user.id,msg.text)
+    # await db.edit_fio(msg.from_user.id,msg.text)
     if msg.from_user.id in ID_ADMIN:
         await msg.answer('akkaunt yangilandi',reply_markup=kb_admin)
     else:
