@@ -34,7 +34,7 @@ async def start(msg: types.Message):
 async def load_name(msg: types.Message, state=FSMContext):
     async with state.proxy() as data:
         data['user_id'] = msg.from_user.id
-        data['f.i.o'] = msg.text
+        data['full_name'] = msg.text
     await msg.answer('Отправьте номер телефона\nнажмите кнопку снизу чтобы отправить контакт👇', reply_markup=phone_kb)
     await UserRegister.next()
 

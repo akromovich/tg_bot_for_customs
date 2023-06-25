@@ -99,8 +99,14 @@ lang_ru = KeyboardButton("RU")
 lang_eng = KeyboardButton("ENG")
 lang_kb.add(lang_uz, lang_ru, lang_eng)
 
+back_org = ReplyKeyboardMarkup(resize_keyboard=True)
+back_org_kb = KeyboardButton('Bekor qilish')
+back_org.add(back_org_kb)
+
 for_contact = InlineKeyboardMarkup(row_width=3)
-contact_name = InlineKeyboardButton(text='F.I.O',callback_data='1')
-contact_phone_number = InlineKeyboardButton(text='telefon raqam',callback_data='1')
-contact_lang = InlineKeyboardButton(text='Til',callback_data='1')
+contact_name = InlineKeyboardButton(text='F.I.O',callback_data='shaxsiy isimni o`zgartirish')
+contact_phone_number = InlineKeyboardButton(text='telefon raqam',callback_data='shaxsiy telefon o`zgartirish')
+contact_lang = InlineKeyboardButton(text='Til',callback_data='shaxsiy tilni o`zgartirish')
 for_contact.add(contact_name,contact_phone_number,contact_lang)
+
+

@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram import Dispatcher, types
 from keyboards.kb_admin import *
-from states.states import UserRegister
+from states.states import *
 from db import DataBase
 from aiogram.types import ReplyKeyboardRemove
 db = DataBase()
@@ -36,6 +36,23 @@ async def list_users(msg:types.Message):
 async def settings(msg:types.Message):
     await msg.answer(await db.db_settings(msg.from_user.id),parse_mode='html',reply_markup=for_contact)
 
+@dp.callback_query_handler(Text(equals='shaxsiy isimni o`zgartirish'))
+async def edit_user_info(clb:types.Message):
+    await clb.message.answer('To`liq ismingizni kiriting (Rasulov Rasul Rasulovich)',reply_markup=back_org)
+    await EditUserDataFullName.first()
+
+@dp.message_handler(state=EditUserDataFullName.full_name)
+async def edit_user_full_name(msg:types.Message,state:FSMContext):
+    await db.edit_fio(msg.from_user.id,msg.text)
+    if msg.from_user.id in ID_ADMIN:
+        await msg.answer('akkaunt yangilandi',reply_markup=kb_admin)
+    else:
+        await msg.answer('akkaunt yangilandi',reply_markup=kb)
+    await settings(msg)
+    
+    await state.finish()
+    
+
 @dp.message_handler(Text(equals='Kontaktlar📞'))
 async def contacts(msg:types.Message):
     
@@ -44,5 +61,16 @@ async def contacts(msg:types.Message):
     else:
         await msg.answer(await db.db_contacts(),parse_mode='html',reply_markup=kb)
 
+@dp.message_handler(Text(equals='Biz haqimizda🪪'))
+async def about_us(msg:types.Message):
+    if msg.from_user.id in ID_ADMIN:
+        await msg.answer(await db.db_about_us(),reply_markup=kb_admin)
+    else:
+        await msg.answer(await db.db_about_us(),reply_markup=kb)
 def register_admin_handlers(dp:Dispatcher):
     pass
+
+@dp.message_handler(Text(equals='Bekor qilish'),state='*')
+async def otmena(msg:types.Message,state:FSMContext):
+    await state.finish()
+    await main_menu(msg)

@@ -3,75 +3,117 @@ import sqlalchemy as db
 
 class DataBase:
     def __init__(self):
-        self.engine = db.create_engine('sqlite:///database.db')
+        self.engine = db.create_engine("sqlite:///database.db")
         self.connect = self.engine.connect()
         self.metadata = db.MetaData()
-        self.users = db.Table('users', self.metadata,
-                            db.Column('id', db.Integer, primary_key=True,unique=True, autoincrement=True),
-                            db.Column('user_id', db.Integer, unique=True),
-                            db.Column('f.i.o', db.Text),
-                            db.Column('phone_number', db.Text),
-                            db.Column('lang', db.Text),
-                            extend_existing=True)
+        self.users = db.Table(
+            "users",
+            self.metadata,
+            db.Column(
+                "id", db.Integer, primary_key=True, unique=True, autoincrement=True
+            ),
+            db.Column("user_id", db.Integer, unique=True),
+            db.Column("full_name", db.Text),
+            db.Column("phone_number", db.Text),
+            db.Column("lang", db.Text),
+            extend_existing=True,
+        )
 
-        self.contacts = db.Table('contact_us',self.metadata,
-                            db.Column('id',db.Integer,primary_key=True,unique=True,autoincrement=True),
-                            db.Column('phone_number_1',db.Text),
-                            db.Column('phone_number_2',db.Text),
-                            extend_existing=True)
+        self.contacts = db.Table(
+            "contact_us",
+            self.metadata,
+            db.Column(
+                "id", db.Integer, primary_key=True, unique=True, autoincrement=True
+            ),
+            db.Column("phone_number_1", db.Text),
+            db.Column("phone_number_2", db.Text),
+            extend_existing=True,
+        )
 
-        self.about_us = db.Table('about_us',self.metadata,
-                            db.Column('id',db.Integer,primary_key=True,unique=True,autoincrement=True),
-                            db.Column('about_us',db.Text),
-                            extend_existing=True)
-
+        self.about_us = db.Table(
+            "about_us",
+            self.metadata,
+            db.Column(
+                "id", db.Integer, primary_key=True, unique=True, autoincrement=True
+            ),
+            db.Column("about_us", db.Text),
+            extend_existing=True,
+        )
 
         self.metadata.create_all(self.engine)
+
     async def create_tables(self):
         global users
         global contact
 
     async def add_user(self, data):
         with self.connect:
-            insert_query = self.users.insert().values([
-                {'user_id': data['user_id'], 'f.i.o':data['f.i.o'],
-                    'phone_number':data['phone_number'], 'lang':data['lang']},
-            ])
+            insert_query = self.users.insert().values(
+                [
+                    {
+                        "user_id": data["user_id"],
+                        "full_name": data["full_name"],
+                        "phone_number": data["phone_number"],
+                        "lang": data["lang"],
+                    },
+                ]
+            )
             self.connect.execute(insert_query)
             self.connect.commit()
 
     async def check_user(self, user_id):
-        with self.engine.connect()  as connect:
-            user_data = db.select(self.users).where(self.users.columns.user_id == user_id)
+        with self.engine.connect() as connect:
+            user_data = db.select(self.users).where(
+                self.users.columns.user_id == user_id
+            )
             answer = connect.execute(user_data)
             return bool(len(answer.fetchall()))
 
-
     async def list_users_db(self):
-        with self.engine.connect()  as connect:
-            res=db.select(self.users)
+        with self.engine.connect() as connect:
+            res = db.select(self.users)
             result = connect.execute(res)
             # await message.answer(f'{i[0]}.{i[1]} {i[2]} \nдолжность:{i[3]}\n{i[4]}',reply_markup=kb_admin.del_or_send)
             g = []
             for i in result.fetchall():
-                a= f'id:{i[0]}\ntg_id: <code>{i[1]}</code>\nF.I.O: {i[2]}\ntelefon nomeri: <code>{i[3]}</code>\ntanlagan tili: {i[4]}\n_____________\n'
+                a = f"id:{i[0]}\ntg_id: <code>{i[1]}</code>\nF.I.O: {i[2]}\ntelefon nomeri: <code>{i[3]}</code>\ntanlagan tili: {i[4]}\n_____________\n"
                 g.append(a)
-            return ''.join(g)
+            return "".join(g)
 
-    async def db_settings(self,user_id):
+    async def db_settings(self, user_id):
         with self.engine.connect() as connect:
             res = db.select(self.users).where(self.users.columns.user_id == user_id)
             result = connect.execute(res)
             for i in result.fetchall():
-                return f'F.I.O: {i[2]}\nTelefon raqami: <code>{i[3]}</code>\nTil: {i[4]}'
-        
+                return (
+                    f"F.I.O: {i[2]}\nTelefon raqami: <code>{i[3]}</code>\nTil: {i[4]}"
+                )
+
     async def db_contacts(self):
         with self.engine.connect() as connect:
             res = db.select(self.contacts)
             result = connect.execute(res)
             # count = 0
             for i in result.fetchall():
-                return f'Biz bilan bog`lanish uchun :\n<a>{i[1]}</a>\n<code>{i[2]}</code>\nraqamlariga qo`ng`iroq qilishingiz mumkin'
+                return f"Biz bilan bog`lanish uchun :\n<code>{i[1]}</code>\n<code>{i[2]}</code>\nraqamlariga qo`ng`iroq qilishingiz mumkin"
+
+    async def db_about_us(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.about_us)
+            result = connect.execute(res)
+            # count = 0
+            for i in result.fetchall():
+                return i[1]
+
+    async def edit_fio(self, id,new_fio):
+        print(id,new_fio)
+        with self.engine.connect() as connect:
+            res = db.update(self.users).where(self.users.columns.user_id==id).values(full_name=new_fio)
+            result = connect.execute(res)
+            print(1)
+            self.connect.commit()
+
+
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())
