@@ -93,6 +93,11 @@ phone_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 phone_k1 = KeyboardButton("Отправть контакт", request_contact=True)
 phone_kb.add(phone_k1)
 
+phone_kb_for_edit = ReplyKeyboardMarkup(resize_keyboard=True)
+phone_kb_for_edit_kb_1 = KeyboardButton('Telefon_raqam_yuborish',request_contact=True)
+phone_kb_for_edit_kb_2 = KeyboardButton('Bekor qilish')
+phone_kb_for_edit.add(phone_kb_for_edit_kb_1).add(phone_kb_for_edit_kb_2)
+
 lang_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 lang_uz = KeyboardButton("UZ")
 lang_ru = KeyboardButton("RU")

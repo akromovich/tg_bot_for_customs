@@ -109,9 +109,25 @@ class DataBase:
         print(id,new_fio)
         with self.engine.connect() as connect:
             res = db.update(self.users).where(self.users.columns.user_id==id).values(full_name=new_fio)
-            result = connect.execute(res)
+            connect.execute(res)
             print(1)
-            self.connect.commit()
+            connect.commit()
+    
+    async def edit_phone_number(self, id,new_phone_number):
+        print(id,new_phone_number)
+        with self.engine.connect() as connect:
+            res = db.update(self.users).where(self.users.columns.user_id==id).values(phone_number=new_phone_number)
+            connect.execute(res)
+            print(1)
+            connect.commit()
+
+    async def edit_lang(self, id,new_lang):
+        print(id,new_lang)
+        with self.engine.connect() as connect:
+            res = db.update(self.users).where(self.users.columns.user_id==id).values(lang=new_lang)
+            connect.execute(res)
+            print(1)
+            connect.commit()
 
 
 # select_all = db.select(users)
