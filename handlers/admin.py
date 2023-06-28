@@ -9,7 +9,7 @@ from db import DataBase
 from aiogram.types import ReplyKeyboardRemove
 
 db = DataBase()
-
+lang_list = ['UZ','RU','ENG']
 
 @dp.message_handler(Text(equals="Katalog🗂"))
 async def catalog(msg: types.Message):
@@ -66,13 +66,6 @@ async def edit_user_phone_number_start(clb: types.Message):
     )
     await EditUserDataPhoneNumber.first()
 
-
-@dp.callback_query_handler(Text(equals="shaxsiy tilni o`zgartirish"))
-async def edit_user_lang_start(clb: types.Message):
-    await clb.message.answer("Tilni tanlang:", reply_markup=back_org)
-    await EditUserDataLang.first()
-
-
 @dp.message_handler(state=EditUserDataPhoneNumber.phone_number, content_types=["any"])
 async def edit_user_phone_number(msg: types.Message, state: FSMContext):
     if msg.contact:
@@ -88,6 +81,26 @@ async def edit_user_phone_number(msg: types.Message, state: FSMContext):
     else:
         await msg.answer("xatolik")
 
+@dp.callback_query_handler(Text(equals="shaxsiy tilni o`zgartirish"))
+async def edit_user_lang_start(clb: types.Message):
+    await clb.message.answer("Tilni tanlang:", reply_markup=lang_kb)
+    await EditUserDataLang.first()
+
+@dp.message_handler(state=EditUserDataLang.lang)
+async def edit_user_lang(msg: types.Message, state: FSMContext):
+    if msg.text in lang_list:
+        await db.edit_lang(msg.from_user.id, msg.text)
+        if msg.from_user.id in ID_ADMIN:
+            await msg.answer("akkaunt yangilandi", reply_markup=kb_admin)
+        else:
+            await msg.answer("akkaunt yangilandi", reply_markup=kb)
+        await settings(msg)
+
+        await state.finish()
+    else:
+        await msg.answer("Tilni tanlang:", reply_markup=lang_kb)
+
+
 
 @dp.message_handler(state=EditUserDataFullName.full_name)
 async def edit_user_full_name(msg: types.Message, state: FSMContext):
@@ -100,17 +113,6 @@ async def edit_user_full_name(msg: types.Message, state: FSMContext):
 
     await state.finish()
 
-
-@dp.message_handler(state=EditUserDataLang.lang)
-async def edit_user_lang(msg: types.Message, state: FSMContext):
-    await db.edit_lang(msg.from_user.id, msg.text)
-    if msg.from_user.id in ID_ADMIN:
-        await msg.answer("akkaunt yangilandi", reply_markup=kb_admin)
-    else:
-        await msg.answer("akkaunt yangilandi", reply_markup=kb)
-    await settings(msg)
-
-    await state.finish()
 
 
 @dp.message_handler(Text(equals="Kontaktlar📞"))

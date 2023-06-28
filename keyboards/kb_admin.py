@@ -102,7 +102,9 @@ lang_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 lang_uz = KeyboardButton("UZ")
 lang_ru = KeyboardButton("RU")
 lang_eng = KeyboardButton("ENG")
-lang_kb.add(lang_uz, lang_ru, lang_eng)
+lang_back = KeyboardButton('Bekor qilish')
+lang_kb.add(lang_uz, lang_ru, lang_eng).add(lang_back)
+
 
 back_org = ReplyKeyboardMarkup(resize_keyboard=True)
 back_org_kb = KeyboardButton('Bekor qilish')
