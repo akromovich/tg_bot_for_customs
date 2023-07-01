@@ -14,3 +14,9 @@ class EditUserDataPhoneNumber(StatesGroup):
 
 class EditUserDataLang(StatesGroup):
     lang = State()
+
+class AddProduct(StatesGroup):
+    name = State()
+    desc = State()
+    price  = State()
+    photo = State()

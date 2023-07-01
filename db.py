@@ -40,8 +40,17 @@ class DataBase:
             extend_existing=True,
         )
 
-        self.metadata.create_all(self.engine)
+        self.products = db.Table(
+            'products',
+            self.metadata,
+            db.Column('id',db.Integer,primary_key=True,autoincrement=True),
+            db.Column('name',db.Text,nullable=False),
+            db.Column('decs',db.Text,nullable=False),
+            db.Column('price',db.Integer),
+            db.Column('photo',db.BLOB),extend_existing=True
+        )
 
+        self.metadata.create_all(self.engine)
     async def create_tables(self):
         global users
         global contact
@@ -122,12 +131,32 @@ class DataBase:
             connect.commit()
 
     async def edit_lang(self, id,new_lang):
-        print(id,new_lang)
         with self.engine.connect() as connect:
             res = db.update(self.users).where(self.users.columns.user_id==id).values(lang=new_lang)
             connect.execute(res)
             print(1)
             connect.commit()
+    async def convert_to_binary_data(self,filename):
+    # Преобразование данных в двоичный формат
+        with open(filename, 'rb') as file:
+            blob_data = file.read()
+        return blob_data
+
+    async def add_product(self,data,photo):
+        emp_photo = self.convert_to_binary_data(photo)
+        with self.engine.connect() as connect:
+            insert_query = self.products.insert().values(
+                [
+                    {
+                        'name':data['name'],
+                        'decs':data['desc'],
+                        'price':data['price'],
+                        'photo':emp_photo,
+                    }
+                ]
+            )
+            self.connect.execute(insert_query)
+            self.connect.commit()
 
 
 # select_all = db.select(users)

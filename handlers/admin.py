@@ -133,5 +133,40 @@ async def about_us(msg: types.Message):
         await msg.answer(await db.db_about_us(), reply_markup=kb)
 
 
+
+##_______TOVAR KUSHISH__________
+@dp.message_handler(Text(equals='Tovar kushish+'))
+async def add_product(msg:types.Message):
+    await msg.answer('tovarni nomini kiriting: ')
+    await AddProduct.first()
+
+@dp.message_handler(state=AddProduct.name)
+async def add_product_name(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['name']=msg.text
+    await msg.answer('tovar haqida malumot kiriting: ')
+    await AddProduct.next()
+
+@dp.message_handler(state=AddProduct.desc)
+async def add_product_desc(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['desc']=msg.text
+    await msg.answer('tovarni narxini kiriting <b>(so`mda)</b>:',parse_mode='html')
+    await AddProduct.next()
+
+@dp.message_handler(state=AddProduct.price)
+async def add_product_price(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['price']=msg.text
+    await msg.answer('tovarni rasmini yuboring yuboring:')
+    await AddProduct.next()
+
+@dp.message_handler(state=AddProduct.photo,content_types=['photo'])
+async def add_product_photo(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        await db.add_product(data,msg.photo)    
+
+    await msg.answer('tovar kushildi')
+
 def register_admin_handlers(dp: Dispatcher):
     pass
