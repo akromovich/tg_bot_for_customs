@@ -1,4 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton,InlineKeyboardMarkup,InlineKeyboardButton
+import db
 
 back = KeyboardButton("назад◀️")
 back_category = KeyboardButton("назад")
@@ -116,4 +117,4 @@ contact_phone_number = InlineKeyboardButton(text='telefon raqam',callback_data='
 contact_lang = InlineKeyboardButton(text='Til',callback_data='shaxsiy tilni o`zgartirish')
 for_contact.add(contact_name,contact_phone_number,contact_lang)
 
-
+ 

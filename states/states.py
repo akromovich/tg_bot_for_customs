@@ -19,4 +19,5 @@ class AddProduct(StatesGroup):
     name = State()
     desc = State()
     price  = State()
+    category = State()
     photo = State()

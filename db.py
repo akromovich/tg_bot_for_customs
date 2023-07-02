@@ -47,10 +47,12 @@ class DataBase:
             db.Column('name',db.Text,nullable=False),
             db.Column('decs',db.Text,nullable=False),
             db.Column('price',db.Integer),
-            db.Column('photo',db.BLOB),extend_existing=True
+            db.Column('category',db.Text),
+            db.Column('photo',db.Text),
         )
 
         self.metadata.create_all(self.engine)
+        self.connect.commit()
     async def create_tables(self):
         global users
         global contact
@@ -136,14 +138,8 @@ class DataBase:
             connect.execute(res)
             print(1)
             connect.commit()
-    async def convert_to_binary_data(self,filename):
-    # Преобразование данных в двоичный формат
-        with open(filename, 'rb') as file:
-            blob_data = file.read()
-        return blob_data
-
-    async def add_product(self,data,photo):
-        emp_photo = self.convert_to_binary_data(photo)
+  
+    async def add_product(self,data):
         with self.engine.connect() as connect:
             insert_query = self.products.insert().values(
                 [
@@ -151,14 +147,29 @@ class DataBase:
                         'name':data['name'],
                         'decs':data['desc'],
                         'price':data['price'],
-                        'photo':emp_photo,
+                        'category':data['category'],
+                        'photo':data['photo_id'],
                     }
                 ]
             )
             self.connect.execute(insert_query)
             self.connect.commit()
 
+    async def show_all_product(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.products)
+            result = connect.execute(res)
+            # count = 0
+            return result.fetchall()
+        
+    async def category(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.products)
+            result = connect.execute(res)
+            # count = 0
+            return result.fetchall()
 
+a = DataBase()
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())
