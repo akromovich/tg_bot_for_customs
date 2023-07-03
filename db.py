@@ -175,7 +175,6 @@ class DataBase:
             self.connect.execute(res)
             self.connect.commit()
 
-a = DataBase()
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())
