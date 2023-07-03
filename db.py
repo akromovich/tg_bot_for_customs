@@ -40,8 +40,19 @@ class DataBase:
             extend_existing=True,
         )
 
-        self.metadata.create_all(self.engine)
+        self.products = db.Table(
+            'products',
+            self.metadata,
+            db.Column('id',db.Integer,primary_key=True,autoincrement=True),
+            db.Column('name',db.Text,nullable=False),
+            db.Column('decs',db.Text,nullable=False),
+            db.Column('price',db.Integer),
+            db.Column('category',db.Text),
+            db.Column('photo',db.Text),
+        )
 
+        self.metadata.create_all(self.engine)
+        self.connect.commit()
     async def create_tables(self):
         global users
         global contact
@@ -122,14 +133,49 @@ class DataBase:
             connect.commit()
 
     async def edit_lang(self, id,new_lang):
-        print(id,new_lang)
         with self.engine.connect() as connect:
             res = db.update(self.users).where(self.users.columns.user_id==id).values(lang=new_lang)
             connect.execute(res)
             print(1)
             connect.commit()
+  
+    async def add_product(self,data):
+        with self.engine.connect() as connect:
+            insert_query = self.products.insert().values(
+                [
+                    {
+                        'name':data['name'],
+                        'decs':data['desc'],
+                        'price':data['price'],
+                        'category':data['category'],
+                        'photo':data['photo_id'],
+                    }
+                ]
+            )
+            self.connect.execute(insert_query)
+            self.connect.commit()
 
+    async def show_all_product(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.products)
+            result = connect.execute(res)
+            # count = 0
+            return result.fetchall()
+        
+    async def category(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.products)
+            result = connect.execute(res)
+            # count = 0
+            return result.fetchall()
+            
+    async def insert_about_us(self,data):
+        with self.engine.connect() as connect:
+            res = db.update(self.about_us).where(self.about_us.columns.id==1).values(about_us=data)
+            self.connect.execute(res)
+            self.connect.commit()
 
+a = DataBase()
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
 # print(select_all_q.fetchall())

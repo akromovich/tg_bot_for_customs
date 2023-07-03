@@ -14,3 +14,13 @@ class EditUserDataPhoneNumber(StatesGroup):
 
 class EditUserDataLang(StatesGroup):
     lang = State()
+
+class AddProduct(StatesGroup):
+    name = State()
+    desc = State()
+    price  = State()
+    category = State()
+    photo = State()
+
+class AddAboutUs(StatesGroup):
+    text = State()

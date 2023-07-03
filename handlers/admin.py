@@ -13,7 +13,12 @@ lang_list = ['UZ','RU','ENG']
 
 @dp.message_handler(Text(equals="Katalog🗂"))
 async def catalog(msg: types.Message):
-    await msg.answer("Bosh katalogi", reply_markup=katalog)
+    if msg.from_user.id in ID_ADMIN:
+        await msg.answer('tovarlar haqida malumot👇',reply_markup=kb_admin)
+    else:
+        await msg.answer('tovarlar haqida malumot👇',reply_markup=kb_admin)
+    for i in await db.show_all_product():
+        await bot.send_photo(msg.chat.id,photo=i[5],caption=f'<b>NOMI</b>: {i[1]}\n\n{i[2]}\n\n<b>narxi</b>: {i[3]}s`om',parse_mode='html')
 
 
 @dp.message_handler(commands=["menu"])
@@ -27,6 +32,13 @@ async def main_menu(msg: types.Message):
         else:
             await bot.send_message(msg.chat.id, "bo`limlni tanlang👇", reply_markup=kb)
 
+@dp.message_handler(Text(equals='назад◀️'))
+async def cancel_main_menu(msg:types.Message):
+    await main_menu(msg)
+
+@dp.message_handler(Text(equals='назад'))
+async def cancel_main_menu(msg:types.Message):
+    await catalog(msg)
 
 @dp.message_handler(Text(equals="Bekor qilish"), state="*")
 async def otmena(msg: types.Message, state: FSMContext):
@@ -132,6 +144,69 @@ async def about_us(msg: types.Message):
     else:
         await msg.answer(await db.db_about_us(), reply_markup=kb)
 
+
+
+##_______TOVAR KUSHISH__________
+@dp.message_handler(Text(equals='Tovar kushish+'))
+async def add_product(msg:types.Message):
+    await msg.answer('tovarni nomini kiriting: ',reply_markup=back_org)
+    await AddProduct.first()
+
+@dp.message_handler(state=AddProduct.name)
+async def add_product_name(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['name']=msg.text
+    await msg.answer('tovar haqida malumot kiriting: ')
+    await AddProduct.next()
+
+@dp.message_handler(state=AddProduct.desc)
+async def add_product_desc(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['desc']=msg.text
+    await msg.answer('tovarni narxini kiriting <b>(so`mda)</b>:',parse_mode='html')
+    await AddProduct.next()
+
+
+@dp.message_handler(state=AddProduct.price)
+async def add_product_price(msg:types.Message,state:FSMContext):
+    category = ReplyKeyboardMarkup(resize_keyboard=True)
+    for i in await db.category():
+        if i[4] not in category:
+            category.add(KeyboardButton(i[4]))
+        else:
+            pass
+    category.add(KeyboardButton('Bekor qilish'))
+    async with state.proxy() as data:
+        data['price']=msg.text
+    await msg.answer('tovarni kategoryasini kiriting: ',reply_markup=category)
+    await AddProduct.next()
+
+@dp.message_handler(state=AddProduct.category)
+async def add_product_category(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['category']=msg.text
+
+    await msg.answer('tovarni rasmini yuboring :')
+    await AddProduct.next()
+
+@dp.message_handler(state=AddProduct.photo,content_types=['photo'])
+async def add_product_photo(msg:types.Message,state:FSMContext):
+    async with state.proxy() as data:
+        data['photo_id']=msg.photo[0].file_id
+        await db.add_product(data)    
+    await msg.answer('tovar kushildi✅',reply_markup=kb_admin)
+    await state.finish()
+
+@dp.message_handler(Text(equals='Biz haqimizda malumot qo`shish+'))
+async def add_data_about_us_start(msg:types.Message):
+    await msg.answer('firma haqida malumot qo`shing: ')
+    await AddAboutUs.first()
+
+@dp.message_handler(state=AddAboutUs.text)
+async def add_data_about_us(msg:types.Message,state:FSMContext):
+    await db.insert_about_us(msg.text)
+    await state.finish()
+    await msg.answer('malumot qo`shildi')
 
 def register_admin_handlers(dp: Dispatcher):
     pass
