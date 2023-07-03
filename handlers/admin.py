@@ -197,6 +197,16 @@ async def add_product_photo(msg:types.Message,state:FSMContext):
     await msg.answer('tovar kushildi✅',reply_markup=kb_admin)
     await state.finish()
 
+@dp.message_handler(Text(equals='Biz haqimizda malumot qo`shish+'))
+async def add_data_about_us_start(msg:types.Message):
+    await msg.answer('firma haqida malumot qo`shing: ')
+    await AddAboutUs.first()
+
+@dp.message_handler(state=AddAboutUs.text)
+async def add_data_about_us(msg:types.Message,state:FSMContext):
+    await db.insert_about_us(msg.text)
+    await state.finish()
+    await msg.answer('malumot qo`shildi')
 
 def register_admin_handlers(dp: Dispatcher):
     pass

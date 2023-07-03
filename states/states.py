@@ -21,3 +21,6 @@ class AddProduct(StatesGroup):
     price  = State()
     category = State()
     photo = State()
+
+class AddAboutUs(StatesGroup):
+    text = State()

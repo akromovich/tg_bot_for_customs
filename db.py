@@ -168,6 +168,12 @@ class DataBase:
             result = connect.execute(res)
             # count = 0
             return result.fetchall()
+            
+    async def insert_about_us(self,data):
+        with self.engine.connect() as connect:
+            res = db.update(self.about_us).where(self.about_us.columns.id==1).values(about_us=data)
+            self.connect.execute(res)
+            self.connect.commit()
 
 a = DataBase()
 # select_all = db.select(users)
