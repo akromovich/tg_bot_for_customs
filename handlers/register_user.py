@@ -16,16 +16,12 @@ async def start(msg: types.Message):
 
     global ID
     ID = msg.from_user.id
-    if msg.from_user.id in ID_ADMIN:
-        await msg.answer('siz adminsiz✅')
-        await main_menu(msg)
+    if not await db.check_user(msg.from_user.id):
+        await msg.answer('Ismni kiriting F.I.O\nmisol:\nAzizov Aziz Azizovich:')
+        await UserRegister.first()
     else:
-        if not await db.check_user(msg.from_user.id):
-            await msg.answer('Ismni kiriting F.I.O\nmisol:\nAzizov Aziz Azizovich:')
-            await UserRegister.first()
-        else:
-            await bot.send_message(msg.chat.id, "siz ro`yhatdan utgansiz")
-            await main_menu(msg)
+        await bot.send_message(msg.chat.id, "siz ro`yhatdan utgansiz")
+        await main_menu(msg)
 
 
 

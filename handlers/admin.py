@@ -6,7 +6,7 @@ from aiogram import Dispatcher, types
 from keyboards.kb_admin import *
 from states.states import *
 from db import DataBase
-from aiogram.types import ReplyKeyboardRemove
+from aiogram.types import ReplyKeyboardRemove,InlineKeyboardMarkup,InlineKeyboardButton
 
 db = DataBase()
 lang_list = ['UZ','RU','ENG']
@@ -16,11 +16,20 @@ async def catalog(msg: types.Message):
     if msg.from_user.id in ID_ADMIN:
         await msg.answer('tovarlar haqida malumot👇',reply_markup=kb_admin)
     else:
-        await msg.answer('tovarlar haqida malumot👇',reply_markup=kb_admin)
-    for i in await db.show_all_product():
-        await bot.send_photo(msg.chat.id,photo=i[5],caption=f'<b>NOMI</b>: {i[1]}\n\n{i[2]}\n\n<b>narxi</b>: {i[3]}s`om',parse_mode='html')
+        await msg.answer('tovarlar haqida malumot👇',reply_markup=kb)
+    all_catalog = InlineKeyboardMarkup()
+    for i in await db.show_all_catalog():
+        all_catalog.add(InlineKeyboardButton(text=i[4],callback_data=i[4]))
+    await msg.answer('kategoryani tanlang',reply_markup=all_catalog)
+    await AllProduct().first()
+        # await bot.send_photo(msg.chat.id,photo=i[5],caption=f'<b>NOMI</b>: {i[1]}\n\n{i[2]}\n\n<b>narxi</b>: {i[3]}s`om',parse_mode='html')
 
-
+@dp.callback_query_handler(state=AllProduct.category)
+async def show_all_product_func(clb:types.CallbackQuery,state:FSMContext):
+    for i in await db.category(clb.data):
+        await bot.send_photo(clb.message.chat.id,photo=i[5],caption=f'<b>NOMI</b>: {i[1]}\n\n{i[2]}\n\n<b>narxi</b>: {i[3]}s`om',parse_mode='html')
+        await clb.answer()
+        await state.finish()
 @dp.message_handler(commands=["menu"])
 async def main_menu(msg: types.Message):
     if msg.from_user.id in ID_ADMIN:
@@ -149,9 +158,11 @@ async def about_us(msg: types.Message):
 ##_______TOVAR KUSHISH__________
 @dp.message_handler(Text(equals='Tovar kushish+'))
 async def add_product(msg:types.Message):
-    await msg.answer('tovarni nomini kiriting: ',reply_markup=back_org)
-    await AddProduct.first()
-
+    if msg.from_user.id in ID_ADMIN:
+        await msg.answer('tovarni nomini kiriting: ',reply_markup=back_org)
+        await AddProduct.first()
+    else:
+        await msg.answer('siz admin emassiz')
 @dp.message_handler(state=AddProduct.name)
 async def add_product_name(msg:types.Message,state:FSMContext):
     async with state.proxy() as data:
@@ -170,12 +181,20 @@ async def add_product_desc(msg:types.Message,state:FSMContext):
 @dp.message_handler(state=AddProduct.price)
 async def add_product_price(msg:types.Message,state:FSMContext):
     category = ReplyKeyboardMarkup(resize_keyboard=True)
-    for i in await db.category():
-        if i[4] not in category:
-            category.add(KeyboardButton(i[4]))
-        else:
-            pass
+    for i in await db.kb_category():
+        category.add(KeyboardButton(i[4]))
     category.add(KeyboardButton('Bekor qilish'))
+    for i in category:
+        for a in i:
+            if type(a) == type(True):
+                pass
+            else:
+                for b in a:
+                    if type(b) == type(list()):
+                        for g in b:
+                            print(g['text'])
+                    else:
+                        pass
     async with state.proxy() as data:
         data['price']=msg.text
     await msg.answer('tovarni kategoryasini kiriting: ',reply_markup=category)

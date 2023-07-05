@@ -24,3 +24,7 @@ class AddProduct(StatesGroup):
 
 class AddAboutUs(StatesGroup):
     text = State()
+
+class AllProduct(StatesGroup):
+    category = State()
+    

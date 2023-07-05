@@ -162,18 +162,32 @@ class DataBase:
             # count = 0
             return result.fetchall()
         
-    async def category(self):
+    async def category(self,category):
+        with self.engine.connect() as connect:
+            res = db.select(self.products).where(self.products.columns.category==category)
+            result = connect.execute(res)
+            # count = 0
+            return result.fetchall()
+            
+    async def kb_category(self):
         with self.engine.connect() as connect:
             res = db.select(self.products)
             result = connect.execute(res)
             # count = 0
             return result.fetchall()
-            
+
     async def insert_about_us(self,data):
         with self.engine.connect() as connect:
             res = db.update(self.about_us).where(self.about_us.columns.id==1).values(about_us=data)
             self.connect.execute(res)
             self.connect.commit()
+
+    async def show_all_catalog(self):
+        with self.engine.connect() as connect:
+            res = db.select(self.products)
+            result = connect.execute(res)
+            # count = 0
+            return result.fetchall()
 
 # select_all = db.select(users)
 # select_all_q = connect.execute(select_all)
